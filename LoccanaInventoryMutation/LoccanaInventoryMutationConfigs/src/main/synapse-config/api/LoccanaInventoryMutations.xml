@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/loccana/inventory/mutations" name="LoccanaInventoryMutations" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="POST">
+        <inSequence>
+            <log description="debug start" level="custom">
+                <property expression="json-eval($)" name="debug"/>
+            </log>
+            <validate cache-schema="true" source="json-eval($)">
+                <schema key="conf:schema/mutation_validator.json"/>
+                <on-fail>
+                    <property description="Error Message" expression="$ctx:ERROR_MESSAGE" name="message" scope="default" type="STRING"/>
+                    <sequence key="LoccanaInventoryGetResponseError"/>
+                </on-fail>
+            </validate>
+            <log description="Log start" level="custom">
+                <property name="Log Message" value="Insert data mutations"/>
+            </log>
+            <propertyGroup description="Parameter Input">
+                <property expression="json-eval($.item_id)" name="item_id" scope="default" type="STRING"/>
+                <property expression="json-eval($.date_mutation)" name="date_mutation" scope="default" type="STRING"/>
+                <property expression="json-eval($.amount_mutation)" name="amount_mutation" scope="default" type="STRING"/>
+                <property expression="json-eval($.mutation_type_id)" name="mutation_type_id" scope="default" type="STRING"/>
+                <property expression="json-eval($.user_id)" name="user_id" scope="default" type="STRING"/>
+                <property expression="json-eval($.qty_receipt)" name="qty_receipt" scope="default" type="STRING"/>
+                <property expression="json-eval($.qty_bonus)" name="qty_bonus" scope="default" type="STRING"/>
+                <property expression="json-eval($.qty_discount)" name="qty_discount" scope="default" type="STRING"/>
+                <property expression="json-eval($.notes)" name="notes" scope="default" type="STRING"/>
+                <property expression="get-property('SYSTEM_DATE', 'yyyy-MM-dd HH:mm:ss')" name="currentDate" scope="default" type="STRING"/>
+            </propertyGroup>
+            <dataServiceCall description="Create" serviceName="LoccanaInventoryMutationsDataService">
+                <operations type="single">
+                    <operation name="insertMutations">
+                        <param evaluator="xml" expression="get-property('item_id')" name="item_id"/>
+                        <param evaluator="xml" expression="get-property('date_mutation')" name="date_mutation"/>
+                        <param evaluator="xml" expression="get-property('amount_mutation')" name="amount_mutation"/>
+                        <param evaluator="xml" expression="get-property('mutation_type_id')" name="mutation_type_id"/>
+                        <param evaluator="xml" expression="get-property('user_id')" name="user_id"/>
+                        <param evaluator="xml" expression="get-property('qty_receipt')" name="qty_receipt"/>
+                        <param evaluator="xml" expression="get-property('qty_bonus')" name="qty_bonus"/>
+                        <param evaluator="xml" expression="get-property('qty_discount')" name="qty_discount"/>
+                        <param evaluator="xml" expression="get-property('notes')" name="notes"/>
+                        <param evaluator="xml" expression="get-property('currentDate')" name="created_at"/>
+                        <param evaluator="xml" expression="get-property('currentDate')" name="updated_at"/>
+                    </operation>
+                </operations>
+                <source type="inline"/>
+                <target type="body"/>
+            </dataServiceCall>
+            <property name="messageType" scope="axis2" type="STRING" value="application/json"/>
+            <property description="Result" expression="json-eval($)" name="result" scope="default" type="STRING"/>
+            <filter regex="false" source="boolean(get-property('result'))">
+                <then>
+                    <property description="Error Message" name="message" scope="default" type="STRING" value="Gagal menambahkan mutations."/>
+                    <sequence key="LoccanaInventoryGetResponseError"/>
+                </then>
+                <else>
+                    <property description="Success Message" name="message" scope="default" type="STRING" value="Tambah mutations berhasil."/>
+                    <property description="Success data" expression="json-eval($.return)" name="data" scope="default" type="STRING"/>
+                    <sequence key="LoccanaInventoryGetResponseSuccess"/>
+                </else>
+            </filter>
+        </inSequence>
+        <outSequence/>
+        <faultSequence>
+            <property description="ErrorMessage" expression="get-property('ERROR_MESSAGE')" name="message" scope="default" type="STRING"/>
+            <sequence key="LoccanaInventoryGetResponseError"/>
+        </faultSequence>
+    </resource>
+    <resource methods="GET" uri-template="/">
+        <inSequence>
+            <!-- <property description="get mutations Id" expression="get-property('uri.var.id')" name="mutationsId" scope="default" type="STRING"/>
+            <log description="Log start" level="custom">
+                <property expression="get-property('mutationsId')" name="Get detail mutations id"/>
+            </log> -->
+            <sequence key="LoccanaInventoryMutationsGetDetail"/>
+            <filter regex="false" source="boolean(get-property('data'))">
+                <then>
+                    <property description="Error Message" name="message" scope="default" type="STRING" value="mutations tidak ditemukan."/>
+                    <sequence key="LoccanaInventoryGetResponseError"/>
+                </then>
+                <else>
+                    <property description="Success Message" name="message" scope="default" type="STRING" value="mutations ditemukan."/>
+                    <sequence key="LoccanaInventoryGetResponseSuccess"/>
+                </else>
+            </filter>
+        </inSequence>
+        <outSequence/>
+        <faultSequence>
+            <property description="ErrorMessage" expression="get-property('ERROR_MESSAGE')" name="message" scope="default" type="STRING"/>
+            <sequence key="LoccanaInventoryGetResponseError"/>
+        </faultSequence>
+    </resource>
+    <resource methods="POST" uri-template="/types">
+        <inSequence>
+            <log description="debug start" level="custom">
+                <property expression="json-eval($)" name="debug"/>
+            </log>
+            <validate cache-schema="true" source="json-eval($)">
+                <schema key="conf:schema/mutationTypes_validator.json"/>
+                <on-fail>
+                    <property description="Error Message" expression="$ctx:ERROR_MESSAGE" name="message" scope="default" type="STRING"/>
+                    <sequence key="LoccanaInventoryGetResponseError"/>
+                </on-fail>
+            </validate>
+            <log description="Log start" level="custom">
+                <property name="Log Message" value="Insert data mutation types"/>
+            </log>
+            <propertyGroup description="Parameter Input">
+                <property expression="json-eval($.type_code)" name="type_code" scope="default" type="STRING"/>
+                <property expression="json-eval($.type_mutation)" name="type_mutation" scope="default" type="STRING"/>
+                <property expression="get-property('SYSTEM_DATE', 'yyyy-MM-dd HH:mm:ss')" name="currentDate" scope="default" type="STRING"/>
+            </propertyGroup>
+            <dataServiceCall description="Create" serviceName="LoccanaInventoryMutationsDataService">
+                <operations type="single">
+                    <operation name="insertMutationTypes">
+                        <param evaluator="xml" expression="get-property('type_code')" name="type_code"/>
+                        <param evaluator="xml" expression="get-property('type_mutation')" name="type_mutation"/>
+                        <param evaluator="xml" expression="get-property('currentDate')" name="created_at"/>
+                        <param evaluator="xml" expression="get-property('currentDate')" name="updated_at"/>
+                    </operation>
+                </operations>
+                <source type="inline"/>
+                <target type="body"/>
+            </dataServiceCall>
+            <property name="messageType" scope="axis2" type="STRING" value="application/json"/>
+            <property description="Result" expression="json-eval($)" name="result" scope="default" type="STRING"/>
+            <filter regex="false" source="boolean(get-property('result'))">
+                <then>
+                    <property description="Error Message" name="message" scope="default" type="STRING" value="Gagal menambahkan mutation types."/>
+                    <sequence key="LoccanaInventoryGetResponseError"/>
+                </then>
+                <else>
+                    <property description="Success Message" name="message" scope="default" type="STRING" value="Tambah mutation types berhasil."/>
+                    <property description="Success data" expression="json-eval($.return)" name="data" scope="default" type="STRING"/>
+                    <sequence key="LoccanaInventoryGetResponseSuccess"/>
+                </else>
+            </filter>
+        </inSequence>
+        <outSequence/>
+        <faultSequence>
+            <property description="ErrorMessage" expression="get-property('ERROR_MESSAGE')" name="message" scope="default" type="STRING"/>
+            <sequence key="LoccanaInventoryGetResponseError"/>
+        </faultSequence>
+    </resource>
+</api>

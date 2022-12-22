@@ -1,0 +1,102 @@
+<data transports="http https" serviceGroup="" serviceNamespace="" name="LoccanaInventoryMutationsDataService">
+  <description />
+  <config id="DatasourceMasterData">
+    <property name="driverClassName">com.mysql.jdbc.Driver</property>
+    <property name="url">jdbc:mysql://localhost:3306/loccana_masterdata</property>
+    <property name="username">root</property>
+    <property name="password">root</property>
+  </config>
+  <config id="DatasourceInventory">
+    <property name="driverClassName">com.mysql.jdbc.Driver</property>
+    <property name="url">jdbc:mysql://localhost:3306/loccana_inventory</property>
+    <property name="username">root</property>
+    <property name="password">root</property>
+  </config>
+  <query id="insertMutationsQuery" keyColumns="id" returnGeneratedKeys="true" useConfig="DatasourceInventory">
+    <sql>INSERT INTO mutations (item_id,date_mutation,amount_mutation,mutation_type_id,user_id,qty_receipt,qty_bonus,qty_discount,notes,created_at,updated_at) VALUES (:item_id,:date_mutation,:amount_mutation,:mutation_type_id,:user_id,:qty_receipt,:qty_bonus,:qty_discount,:notes,:created_at,:updated_at)</sql>
+    <param name="item_id" sqlType="STRING" paramType="SCALAR" />
+    <param name="date_mutation" sqlType="STRING" paramType="SCALAR" />
+    <param name="amount_mutation" sqlType="STRING" paramType="SCALAR" />
+    <param name="mutation_type_id" sqlType="STRING" paramType="SCALAR" />
+    <param name="user_id" sqlType="STRING" paramType="SCALAR" />
+    <param name="qty_receipt" sqlType="STRING" paramType="SCALAR" />
+    <param name="qty_bonus" sqlType="STRING" paramType="SCALAR" />
+    <param name="qty_discount" sqlType="STRING" paramType="SCALAR" />
+    <param name="notes" sqlType="STRING" paramType="SCALAR" />
+    <param name="created_at" sqlType="STRING" paramType="SCALAR" />
+    <param name="updated_at" sqlType="STRING" paramType="SCALAR" />
+    <result element="return" useColumnNumbers="true">
+      <element name="id" column="1" xsdType="integer" />
+    </result>
+  </query>
+  <query id="showStocksQuery" useConfig="DatasourceInventory">
+    <sql>SELECT a.id, a.`item_code`,a.`item_name`,d.`name`,
+IFNULL(((b.`base_qty`*b.unit_box)/f.convertion),'') AS box_per_lt,
+IFNULL(SUM(g.`qty_receipt`),'') AS stockawal_lt_kg,INSERT INTO mutation_types (type_code, type_mutation, created_at, updated_at) VALUES (:type_code, :type_mutation, :created_at, :updated_at)
+IFNULL(SUM(g.`qty_receipt`)/((b.`base_qty`*b.unit_box)/f.convertion),'') AS stockawal_box,
+IFNULL(SUM(h.`amount_mutation`),'') AS penerimaan_lt_kg,
+IFNULL(SUM(h.`amount_mutation`)/((b.`base_qty`*b.unit_box)/f.convertion),'') AS penerimaan_box
+FROM `loccana_masterdata`.`items` a 
+LEFT JOIN `loccana_masterdata`.`item_qty` b ON a.`id`=b.item_id
+LEFT JOIN `loccana_masterdata`.`item_price` c ON a.`id`=c.`item_id`
+LEFT JOIN `loccana_masterdata`.`partners` d ON a.`partner_id`=d.`id`
+LEFT JOIN `loccana_masterdata`.`uom` e ON a.`uom_id`=e.`id`
+LEFT JOIN `loccana_masterdata`.`uom_convert` f ON e.`id`=f.`id`
+LEFT JOIN `loccana_masterdata`.`item_history` g ON g.`item_id`=a.id
+LEFT JOIN `loccana_inventory`.`mutations` h ON b.`item_id`=h.`item_id`
+GROUP BY a.id</sql>
+    <result outputType="json">{
+    "data": {
+    	"mutations": [
+    		{
+		        "id": "$id",
+		        "item_code": "$item_code",
+		        "item_name": "$item_name",
+		        "name": "$name",
+		        "box_per_lt": "$box_per_lt",
+				"stockawal_lt_kg": "$stockawal_lt_kg",
+				"stockawal_box": "$stockawal_box",
+				"penerimaan_lt_kg": "$penerimaan_lt_kg",
+		        "penerimaan_box": "$penerimaan_box"
+	    	}
+    	]
+    }
+}</result>
+  </query>
+  <query id="insertMutationTypesQuery" keyColumns="id" returnGeneratedKeys="true" useConfig="DatasourceInventory">
+    <sql>INSERT INTO mutation_types (type_code, type_mutation, created_at, updated_at) VALUES (:type_code, :type_mutation, :created_at, :updated_at)</sql>
+    <param name="type_code" sqlType="STRING" paramType="SCALAR" />
+    <param name="type_mutation" sqlType="STRING" paramType="SCALAR" />
+    <param name="created_at" sqlType="STRING" paramType="SCALAR" />
+    <param name="updated_at" sqlType="STRING" paramType="SCALAR" />
+    <result element="return" useColumnNumbers="true">
+      <element name="id" column="1" xsdType="integer" />
+    </result>
+  </query>
+  <operation name="insertMutations">
+    <call-query href="insertMutationsQuery">
+      <with-param name="item_id" query-param="item_id" />
+      <with-param name="date_mutation" query-param="date_mutation" />
+      <with-param name="amount_mutation" query-param="amount_mutation" />
+      <with-param name="mutation_type_id" query-param="mutation_type_id" />
+      <with-param name="user_id" query-param="user_id" />
+      <with-param name="qty_receipt" query-param="qty_receipt" />
+      <with-param name="qty_bonus" query-param="qty_bonus" />
+      <with-param name="qty_discount" query-param="qty_discount" />
+      <with-param name="notes" query-param="notes" />
+      <with-param name="created_at" query-param="created_at" />
+      <with-param name="updated_at" query-param="updated_at" />
+    </call-query>
+  </operation>
+  <operation name="showStocks">
+    <call-query href="showStocksQuery" />
+  </operation>
+  <operation name="insertMutationTypes">
+    <call-query href="insertMutationTypesQuery">
+      <with-param name="type_code" query-param="type_code" />
+      <with-param name="type_mutation" query-param="type_mutation" />
+      <with-param name="created_at" query-param="created_at" />
+      <with-param name="updated_at" query-param="updated_at" />
+    </call-query>
+  </operation>
+</data>

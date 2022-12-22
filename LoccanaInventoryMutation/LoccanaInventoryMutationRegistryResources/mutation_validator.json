@@ -1,0 +1,36 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties": {
+		"item_id": {
+			"type": "string"
+		},
+		"date_mutation": {
+			"type": "string"
+		},
+		"amount_mutation": {
+			"type": "string"
+		},
+		"mutation_type_id": {
+			"type": "string"
+		},
+		"user_id": {
+			"type": "string"
+		},
+		"qty_receipt": {
+			"type": "string"
+		},
+		"qty_bonus": {
+			"type": "string"
+		},
+		"qty_discount": {
+			"type": "string"
+		},
+		"notes": {
+			"type": "string"
+		}
+	},
+	"required": [
+		"item_id", "amount_mutation"
+	]
+}

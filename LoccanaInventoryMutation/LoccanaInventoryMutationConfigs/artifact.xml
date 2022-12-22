@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><artifacts>
+    <artifact name="LoccanaInventoryMutations" groupId="com.loccana.inventory.mutation.api" version="1.0.0" type="synapse/api" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/api/LoccanaInventoryMutations.xml</file>
+    </artifact>
+    <artifact name="LoccanaInventoryMutations_swagger" groupId="com.loccana.inventory.mutation.metadata" version="1.0.0" type="synapse/metadata" serverRole="EnterpriseServiceBus">
+        <file>src/main/resources/metadata/LoccanaInventoryMutations_swagger.yaml</file>
+    </artifact>
+    <artifact name="LoccanaInventoryMutations_metadata" groupId="com.loccana.inventory.mutation.metadata" version="1.0.0" type="synapse/metadata" serverRole="EnterpriseServiceBus">
+        <file>src/main/resources/metadata/LoccanaInventoryMutations_metadata.yaml</file>
+    </artifact>
+    <artifact name="LoccanaInventoryMutationsGetDetail" groupId="com.loccana.inventory.mutation.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/LoccanaInventoryMutationsGetDetail.xml</file>
+    </artifact>
+    <artifact name="LoccanaInventoryGetResponseError" groupId="com.loccana.inventory.mutation.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/LoccanaInventoryGetResponseError.xml</file>
+    </artifact>
+    <artifact name="LoccanaInventoryGetResponseSuccess" groupId="com.loccana.inventory.mutation.sequence" version="1.0.0" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/LoccanaInventoryGetResponseSuccess.xml</file>
+    </artifact>
+</artifacts>
